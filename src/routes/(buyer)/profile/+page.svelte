@@ -1,5 +1,5 @@
 <script>
-import BottomNav from '$lib/components/layout/BottomNav.svelte';
+import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
   const user = {
     name: 'Andi Prasetyo',
     email: 'andi.prasetyo@email.com',

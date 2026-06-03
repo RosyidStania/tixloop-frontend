@@ -1,5 +1,5 @@
 <script>
-  import BottomNav from '$lib/components/layout/BottomNav.svelte';
+  import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
 
   let activeFilter = $state('All');
   const filters = ['All', 'Concert', 'Cinema', 'Sports', 'Events'];

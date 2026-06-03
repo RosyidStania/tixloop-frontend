@@ -63,9 +63,9 @@
 
 <main class="bg-[#0A0910] min-h-screen text-white font-sans pb-10">
   <div class="px-4 pt-12 pb-4 flex items-center gap-3 border-b border-[#1A1825]">
-    <a href="javascript:history.back()" class="w-9 h-9 bg-[#1A1825] rounded-full flex items-center justify-center active:scale-95 transition-transform">
+    <button onclick={() => history.back()} aria-label="Kembali" class="w-9 h-9 bg-[#1A1825] rounded-full flex items-center justify-center active:scale-95 transition-transform">
       <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-    </a>
+    </button>
     <div>
       <h1 class="text-base font-bold leading-tight">Daftar Akun</h1>
       <p class="text-[11px] text-[#AAEF45]">Buat akun TixLoop baru</p>
@@ -92,34 +92,34 @@
 
     <div class="space-y-3">
       <div>
-        <label class="block text-[11px] font-semibold text-gray-400 mb-1.5">Nama Lengkap</label>
-        <input bind:value={fullName} type="text" placeholder="Masukkan nama lengkap" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.name ? 'border-red-500/60' : ''}" />
+        <label for="fullName" class="block text-[11px] font-semibold text-gray-400 mb-1.5">Nama Lengkap</label>
+        <input id="fullName" bind:value={fullName} type="text" placeholder="Masukkan nama lengkap" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.name ? 'border-red-500/60' : ''}" />
         {#if validationErrors.name}
           <p class="text-[10px] text-red-400 mt-1">{validationErrors.name[0]}</p>
         {/if}
       </div>
 
       <div>
-        <label class="block text-[11px] font-semibold text-gray-400 mb-1.5">Email</label>
-        <input bind:value={email} type="email" placeholder="contoh@email.com" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.email ? 'border-red-500/60' : ''}" />
+        <label for="email" class="block text-[11px] font-semibold text-gray-400 mb-1.5">Email</label>
+        <input id="email" bind:value={email} type="email" placeholder="contoh@email.com" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.email ? 'border-red-500/60' : ''}" />
         {#if validationErrors.email}
           <p class="text-[10px] text-red-400 mt-1">{validationErrors.email[0]}</p>
         {/if}
       </div>
 
       <div>
-        <label class="block text-[11px] font-semibold text-gray-400 mb-1.5">Nomor HP</label>
-        <input bind:value={phone} type="tel" placeholder="08123456789" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.phone ? 'border-red-500/60' : ''}" />
+        <label for="phone" class="block text-[11px] font-semibold text-gray-400 mb-1.5">Nomor HP</label>
+        <input id="phone" bind:value={phone} type="tel" placeholder="08123456789" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.phone ? 'border-red-500/60' : ''}" />
         {#if validationErrors.phone}
           <p class="text-[10px] text-red-400 mt-1">{validationErrors.phone[0]}</p>
         {/if}
       </div>
 
       <div>
-        <label class="block text-[11px] font-semibold text-gray-400 mb-1.5">Password</label>
+        <label for="password" class="block text-[11px] font-semibold text-gray-400 mb-1.5">Password</label>
         <div class="relative">
-          <input bind:value={password} type={showPassword ? 'text' : 'password'} placeholder="Minimal 6 karakter" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.password ? 'border-red-500/60' : ''}" />
-          <button onclick={() => showPassword = !showPassword} class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-300">
+          <input id="password" bind:value={password} type={showPassword ? 'text' : 'password'} placeholder="Minimal 6 karakter" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {validationErrors.password ? 'border-red-500/60' : ''}" />
+          <button aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"} onclick={() => showPassword = !showPassword} class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-300">
             {#if showPassword}
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
             {:else}
@@ -133,10 +133,10 @@
       </div>
 
       <div>
-        <label class="block text-[11px] font-semibold text-gray-400 mb-1.5">Konfirmasi Password</label>
+        <label for="confirmPassword" class="block text-[11px] font-semibold text-gray-400 mb-1.5">Konfirmasi Password</label>
         <div class="relative">
-          <input bind:value={confirmPassword} type={showConfirmPassword ? 'text' : 'password'} placeholder="Ketik ulang password" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {confirmPassword && confirmPassword !== password ? 'border-red-500/60' : ''}" />
-          <button onclick={() => showConfirmPassword = !showConfirmPassword} class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-300">
+          <input id="confirmPassword" bind:value={confirmPassword} type={showConfirmPassword ? 'text' : 'password'} placeholder="Ketik ulang password" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors {confirmPassword && confirmPassword !== password ? 'border-red-500/60' : ''}" />
+          <button aria-label={showConfirmPassword ? "Sembunyikan konfirmasi password" : "Tampilkan konfirmasi password"} onclick={() => showConfirmPassword = !showConfirmPassword} class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-300">
             {#if showConfirmPassword}
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
             {:else}
@@ -150,8 +150,8 @@
       </div>
 
       <div>
-        <label class="block text-[11px] font-semibold text-gray-400 mb-1.5">Kode Referral <span class="text-gray-600">(Opsional)</span></label>
-        <input bind:value={referral} type="text" placeholder="Masukkan kode referral" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors" />
+        <label for="referral" class="block text-[11px] font-semibold text-gray-400 mb-1.5">Kode Referral <span class="text-gray-600">(Opsional)</span></label>
+        <input id="referral" bind:value={referral} type="text" placeholder="Masukkan kode referral" class="w-full bg-[#14121E] border border-[#232033] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-[#AAEF45]/60 transition-colors" />
       </div>
     </div>
 

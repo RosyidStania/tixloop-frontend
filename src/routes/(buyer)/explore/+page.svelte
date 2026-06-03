@@ -1,6 +1,6 @@
 <script>
-  import BottomNav from '$lib/components/layout/BottomNav.svelte';
-  import FilterSheet from '$lib/components/explore/FilterSheet.svelte';
+  import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
+  import FilterSheet from '$lib/components/buyer/explore/FilterSheet.svelte';
 
   // Menggunakan Svelte 5 Runes
   let activeCategory = $state('All');

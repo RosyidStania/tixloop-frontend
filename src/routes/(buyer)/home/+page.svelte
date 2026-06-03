@@ -3,7 +3,7 @@
   import LastMinuteDeals from './components/LastMinuteDeals.svelte';
   import Trending from './components/Trending.svelte';
   import NearLocation from './components/NearLocation.svelte';
-  import BottomNav from '$lib/components/layout/BottomNav.svelte';
+  import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
 </script>
 
 <main class="bg-[#0A0910] min-h-screen text-white font-sans pb-24 overflow-x-hidden">
