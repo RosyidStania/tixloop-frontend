@@ -15,6 +15,7 @@
   // Tambahkan $state()
   let verifiedOnly = $state(false);
   let nearEvent = $state(false);
+  let maxPrice = $state(1500000);
 
   function applyFilter() {
     let count = 0;
@@ -23,7 +24,16 @@
     if (verifiedOnly) count++;
     if (nearEvent) count++;
     
-    dispatch('apply', { count });
+    dispatch('apply', { 
+      count, 
+      filters: {
+        activeLocation,
+        activeDate,
+        verifiedOnly,
+        nearEvent,
+        maxPrice
+      } 
+    });
     close();
   }
 
@@ -50,7 +60,7 @@
         <svg class="w-4 h-4 text-[#D4FF00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
         Harga Maksimal
       </h3>
-      <input type="range" min="200000" max="1500000" value="850000" class="w-full accent-[#D4FF00] h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" />
+      <input type="range" min="200000" max="1500000" bind:value={maxPrice} class="w-full accent-[#D4FF00] h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" />
       <div class="flex justify-between text-xs text-gray-400 mt-2">
         <span>Rp 200.000</span>
         <span>Rp 1.500.000</span>

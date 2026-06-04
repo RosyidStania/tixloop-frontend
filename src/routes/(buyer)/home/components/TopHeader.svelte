@@ -1,6 +1,18 @@
 <script>
+  import { goto } from '$app/navigation';
   const categories = ["All", "Concert", "Cinema", "Sports", "Festival", "Theater"];
   let activeCategory = "All";
+  let searchQuery = "";
+
+  function handleSearch(e) {
+    if (e.key === 'Enter') {
+      goto(`/explore?q=${encodeURIComponent(searchQuery)}`);
+    }
+  }
+
+  function handleCategory(cat) {
+    goto(`/explore?category=${encodeURIComponent(cat)}`);
+  }
 </script>
 
 <div class="px-4 pt-12 pb-2">
@@ -30,14 +42,14 @@
     <svg class="w-5 h-5 absolute left-4 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
     </svg>
-    <input type="text" placeholder="Search event, artist, city..." class="w-full bg-[#1A1825] text-sm text-white rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-1 focus:ring-[#D4FF00] placeholder-gray-500" />
+    <input type="text" bind:value={searchQuery} on:keydown={handleSearch} placeholder="Search event, artist, city... (Enter)" class="w-full bg-[#1A1825] text-sm text-white rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-1 focus:ring-[#D4FF00] placeholder-gray-500" />
   </div>
 
   <div class="flex overflow-x-auto hide-scrollbar gap-3 pb-2">
     {#each categories as cat}
       <button 
-        class="px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors {activeCategory === cat ? 'bg-[#D4FF00] text-black' : 'bg-[#1A1825] text-gray-400'}"
-        on:click={() => activeCategory = cat}>
+        class="px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors bg-[#1A1825] text-gray-400 hover:text-white"
+        on:click={() => handleCategory(cat)}>
         {cat}
       </button>
     {/each}
