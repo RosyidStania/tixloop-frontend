@@ -1,12 +1,36 @@
 <script>
-import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
-  const user = {
-    name: 'Andi Prasetyo',
-    email: 'andi.prasetyo@email.com',
-    joined: 'Bergabung sejak Jan 2024',
-    avatar: 'A',
-    verified: true
-  };
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
+  import api from '$lib/axios';
+
+  let user = $state({
+    name: 'Memuat...',
+    email: '...',
+    joined: '...',
+    avatar: '?',
+    verified: false
+  });
+
+  onMount(async () => {
+    try {
+      const response = await api.get('/auth/me');
+      const userData = response.data.data.user || response.data.data;
+      
+      user = {
+        name: userData.name || 'User',
+        email: userData.email || '',
+        joined: userData.created_at ? `Bergabung sejak ${new Date(userData.created_at).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}` : '',
+        avatar: (userData.name || 'U').charAt(0).toUpperCase(),
+        verified: !!userData.email_verified_at
+      };
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+      if (error.response?.status === 401) {
+        goto('/login');
+      }
+    }
+  });
 
   const verifikasi = [
     { id: 'email', label: 'Email', icon: `<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>`, status: 'verified' },
@@ -27,10 +51,9 @@ import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
     { id: 'privacy', label: 'Kebijakan Privasi', icon: `<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>` }
   ];
 
-  import api from '$lib/axios';
-
   let showLogoutConfirm = $state(false);
   let isLoggingOut = $state(false);
+  let isSwitching = $state(false);
 
   async function handleLogout() {
     if (isLoggingOut) return;
@@ -47,8 +70,18 @@ import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
       window.location.href = '/login';
     }
   }
+
+  async function handleSwitchToSeller() {
+    if (isSwitching) return;
+    isSwitching = true;
+    // Slight delay for UX feedback before navigating
+    await new Promise(r => setTimeout(r, 350));
+    goto('/seller/dashboard');
+  }
 </script>
-    <BottomNav activeTab="profile" />
+
+<BottomNav activeTab="profile" />
+
 <main class="bg-[#0A0910] min-h-screen text-white font-sans pb-24">
 
   <!-- Header -->
@@ -86,12 +119,25 @@ import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
       </button>
     </div>
 
-    <!-- Seller CTA -->
-    <button class="w-full bg-[#AAEF45]/10 border border-[#AAEF45]/25 rounded-2xl py-3.5 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
-      <svg class="w-4 h-4 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-      </svg>
-      <span class="text-sm font-bold text-[#AAEF45]">Beralih ke Seller Center</span>
+    <!-- Switch to Seller CTA -->
+    <button
+      onclick={handleSwitchToSeller}
+      disabled={isSwitching}
+      class="w-full bg-[#AAEF45]/10 border border-[#AAEF45]/25 rounded-2xl py-3.5 flex items-center justify-center gap-2 active:scale-[0.98] transition-all {isSwitching ? 'opacity-70' : ''}"
+    >
+      {#if isSwitching}
+        <!-- Spinner -->
+        <svg class="w-4 h-4 text-[#AAEF45] animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <span class="text-sm font-bold text-[#AAEF45]">Beralih...</span>
+      {:else}
+        <svg class="w-4 h-4 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        <span class="text-sm font-bold text-[#AAEF45]">Beralih Sebagai Penjual</span>
+      {/if}
     </button>
 
     <!-- Verifikasi Akun -->
