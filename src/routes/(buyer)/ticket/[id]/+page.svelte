@@ -29,7 +29,7 @@
   </div>
 {:else if listing}
 <main class="bg-[#0A0910] min-h-screen text-white font-sans pb-32">
-  <div class="relative h-72 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1540039155733-d7696d54af58?q=80&w=800&auto=format&fit=crop');">
+  <div class="relative h-72 bg-cover bg-center" style="background-image: url('{listing.ticket.event.event_poster_url || listing.ticket.event.poster_url || 'https://images.unsplash.com/photo-1540039155733-d7696d54af58?q=80&w=800&auto=format&fit=crop'}');">
     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-[#0A0910]"></div>
     
     <div class="absolute top-0 w-full px-4 pt-12 flex justify-between items-center z-10">

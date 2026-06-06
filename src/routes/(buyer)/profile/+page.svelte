@@ -18,7 +18,7 @@
       const userData = response.data.data.user || response.data.data;
       
       user = {
-        name: userData.name || 'User',
+        name: userData.name || 'Pengguna',
         email: userData.email || '',
         joined: userData.created_at ? `Bergabung sejak ${new Date(userData.created_at).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}` : '',
         avatar: (userData.name || 'U').charAt(0).toUpperCase(),
@@ -86,7 +86,7 @@
 
   <!-- Header -->
   <div class="px-4 pt-12 pb-3 flex items-center justify-between">
-    <h1 class="text-xl font-black">Profile</h1>
+    <h1 class="text-xl font-black">Profil</h1>
     <button class="w-9 h-9 bg-[#1A1825] rounded-full flex items-center justify-center relative active:scale-95 transition-transform">
       <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -234,9 +234,10 @@
     <div class="text-center pb-2">
       <p class="text-[10px] text-gray-700">© 2026 TixLoop. All rights reserved.</p>
       <div class="flex items-center justify-center gap-3 mt-1.5">
-        {#each ['Terms', 'Privacy', 'Help', 'Sell'] as link}
-          <a href="/{link.toLowerCase()}" class="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">{link}</a>
-        {/each}
+        <a href="/terms" class="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Syarat</a>
+        <a href="/privacy" class="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Privasi</a>
+        <a href="/help" class="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Bantuan</a>
+        <a href="/sell" class="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Jual</a>
       </div>
     </div>
 

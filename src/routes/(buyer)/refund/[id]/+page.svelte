@@ -1,5 +1,5 @@
 <script>
-  const dispute = {
+  const refund = {
     id: 'TIX-2026-10132',
     eventName: 'Cold Play 2026',
     category: 'General Admission',
@@ -19,8 +19,8 @@
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
       </a>
       <div>
-        <h1 class="text-sm font-bold">Dispute Center</h1>
-        <p class="text-[10px] text-gray-500 font-mono tracking-wide">{dispute.id}</p>
+        <h1 class="text-sm font-bold">Refund Center</h1>
+        <p class="text-[10px] text-gray-500 font-mono tracking-wide">{refund.id}</p>
       </div>
     </div>
   </div>
@@ -43,16 +43,16 @@
       <div>
         <h3 class="font-bold text-xs text-[#FF3366] mb-1">Dana Tertahan Sementara</h3>
         <p class="text-[10px] text-gray-300 leading-relaxed">
-          Dana kamu sebesar <span class="font-bold">{dispute.price}</span> ditahan dalam sistem Escrow hingga sengketa ini diselesaikan oleh admin.
+          Dana kamu sebesar <span class="font-bold">{refund.price}</span> ditahan dalam sistem Escrow hingga sengketa ini diselesaikan oleh admin.
         </p>
       </div>
     </div>
 
     <div class="bg-[#14121E] rounded-2xl p-3 border border-[#232033] flex items-center gap-3">
-      <img src={dispute.image} alt="Event" class="w-14 h-14 rounded-xl object-cover" />
+      <img src={refund.image} alt="Event" class="w-14 h-14 rounded-xl object-cover" />
       <div>
-        <h4 class="font-bold text-sm text-white mb-0.5">{dispute.eventName}</h4>
-        <p class="text-[10px] text-gray-400">{dispute.category} • {dispute.date}</p>
+        <h4 class="font-bold text-sm text-white mb-0.5">{refund.eventName}</h4>
+        <p class="text-[10px] text-gray-400">{refund.category} • {refund.date}</p>
       </div>
     </div>
 
@@ -94,7 +94,7 @@
           Saya tidak bisa masuk ke venue karena petugas bilang barcode pada tiket ini sudah di-scan oleh orang lain pada jam 17:00. Mohon refund dana saya.
         </p>
         <div class="flex gap-2">
-          <img src={dispute.evidenceImg} alt="Bukti 1" class="w-16 h-16 rounded-lg object-cover border border-[#232033]" />
+          <img src={refund.evidenceImg} alt="Bukti 1" class="w-16 h-16 rounded-lg object-cover border border-[#232033]" />
         </div>
       </div>
       <p class="text-[9px] text-gray-500 text-right">21 Juni 2026, 18:30 WIB</p>
@@ -104,7 +104,7 @@
   <div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#232033] p-4 z-40 pb-safe">
     <div class="flex gap-3">
       <button class="flex-1 border border-[#232033] bg-transparent text-white text-xs font-bold py-3.5 rounded-xl transition-transform active:scale-95">
-        Batalkan Dispute
+        Batalkan Refund
       </button>
       <button class="flex-1 bg-[#FF3366] text-white text-xs font-bold py-3.5 rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>

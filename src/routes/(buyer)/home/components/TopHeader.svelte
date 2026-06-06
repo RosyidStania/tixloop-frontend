@@ -1,6 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
-  const categories = ["All", "Concert", "Cinema", "Sports", "Festival", "Theater"];
+  const categories = ["Semua", "Konser", "Bioskop", "Olahraga", "Festival", "Teater"];
   let activeCategory = "All";
   let searchQuery = "";
 
@@ -18,13 +18,12 @@
 <div class="px-4 pt-12 pb-2">
   <div class="flex justify-between items-center mb-6">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 bg-[#D4FF00] rounded-lg flex items-center justify-center">
-        <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M16.5 4.5H7.5C5.84315 4.5 4.5 5.84315 4.5 7.5V16.5C4.5 18.1569 5.84315 19.5 7.5 19.5H16.5C18.1569 19.5 19.5 18.1569 19.5 16.5V7.5C19.5 5.84315 18.1569 4.5 16.5 4.5ZM10.5 14.5L7.5 10.5H9.5L11.5 13.1667L13.5 10.5H15.5L12.5 14.5V17.5H10.5V14.5Z"/>
-        </svg>
-      </div>
-      <span class="text-xl font-bold tracking-wide">TixLoop</span>
+      <svg class="w-7 h-7 text-[#D4FF00]" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M6 4C4.89543 4 4 4.89543 4 6V9C5.10457 9 6 9.89543 6 11C6 12.1046 5.10457 13 4 13V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V13C18.8954 13 18 12.1046 18 11C18 9.89543 18.8954 9 20 9V6C20 4.89543 19.1046 4 18 4H6ZM11.5 6C11.2239 6 11 6.22386 11 6.5V8.5C11 8.77614 11.2239 9 11.5 9H12.5C12.7761 9 13 8.77614 13 8.5V6.5C13 6.22386 12.7761 6 12.5 6H11.5ZM11 11.5C11 11.2239 11.2239 11 11.5 11H12.5C12.7761 11 13 11.2239 13 11.5V13.5C13 13.7761 12.7761 14 12.5 14H11.5C11.2239 14 11 13.7761 11 13.5V11.5ZM11.5 16C11.2239 16 11 16.2239 11 16.5V18.5C11 18.7761 11.2239 19 11.5 19H12.5C12.7761 19 13 18.7761 13 18.5V16.5C13 16.2239 12.7761 16 12.5 16H11.5Z" />
+      </svg>
+      <span class="text-xl font-bold tracking-wide text-white">TixLoop</span>
     </div>
+    
     <div class="flex items-center gap-3">
       <button class="w-10 h-10 rounded-full bg-[#1A1825] flex items-center justify-center relative">
         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +41,7 @@
     <svg class="w-5 h-5 absolute left-4 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
     </svg>
-    <input type="text" bind:value={searchQuery} on:keydown={handleSearch} placeholder="Search event, artist, city... (Enter)" class="w-full bg-[#1A1825] text-sm text-white rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-1 focus:ring-[#D4FF00] placeholder-gray-500" />
+    <input type="text" bind:value={searchQuery} on:keydown={handleSearch} placeholder="Cari event, artis, kota... (Enter)" class="w-full bg-[#1A1825] text-sm text-white rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-1 focus:ring-[#D4FF00] placeholder-gray-500" />
   </div>
 
   <div class="flex overflow-x-auto hide-scrollbar gap-3 pb-2">

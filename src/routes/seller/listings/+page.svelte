@@ -4,13 +4,13 @@
   import BottomNav from '$lib/components/seller/layout/BottomNav.svelte';
   import { ticketService } from '$lib/services/ticketService';
 
-  let activeFilter = $state('active');
+  let activeFilter = $state('draft'); // Pindah tab default ke Pending (draft)
   let isLoading = $state(true);
 
   const filters = [
     { id: 'active', label: 'Active' },
     { id: 'sold', label: 'Sold' },
-    { id: 'draft', label: 'Draft' }
+    { id: 'draft', label: 'Pending' }
   ];
 
   let allListings = $state([]);
@@ -18,15 +18,23 @@
   onMount(async () => {
     try {
       const response = await ticketService.getMyTickets();
-      allListings = response.data.map(t => ({
-        id: t.id,
-        title: t.event ? t.event.event_name : 'Unknown Event',
-        category: t.ticket_category || 'General',
-        harga: Number(t.original_price || 0).toLocaleString('id-ID'),
-        views: t.views || 0,
-        watchers: t.watchers || 0,
-        status: t.status || 'active'
-      }));
+      // Map tickets dari backend ke format UI
+      allListings = response.data.map(t => {
+        // Karena backend TicketResource tidak mengembalikan 'listing_status',
+        // dan secara bisnis logika semua tiket yang baru diupload status listing-nya adalah 'pending',
+        // kita akan paksa semua tiket masuk ke kategori 'draft' (Pending).
+        let mappedStatus = 'draft'; 
+        
+        return {
+          id: t.id,
+          title: t.event ? t.event.event_name : 'Unknown Event',
+          category: t.event ? t.event.event_category : 'General',
+          harga: 'TBD',
+          views: 0,
+          watchers: 0,
+          status: mappedStatus
+        };
+      });
     } catch (error) {
       console.error(error);
     } finally {

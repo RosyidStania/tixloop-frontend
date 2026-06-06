@@ -2,14 +2,14 @@
   import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
 
   let activeFilter = $state('All');
-  const filters = ['All', 'Concert', 'Cinema', 'Sports', 'Events'];
+  const filters = ['Semua', 'Konser', 'Bioskop', 'Olahraga', 'Events'];
 
   const dealsTickets = [
     {
       id: 'TIX-DEAL-01',
-      category: 'Concert',
+      category: 'Konser',
       title: 'Cold Play 2026',
-      artist: 'Various Artists',
+      artist: 'Berbagai Artis',
       venue: 'Jakarta Convention Center, Jakarta',
       originalPrice: 'Rp 600.000',
       currentPrice: 'Rp 280.000',
@@ -46,7 +46,7 @@
         <svg class="w-5 h-5 absolute left-4 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
-        <input type="text" placeholder="Search event, artist, city..." class="w-full bg-[#1A1825] text-sm text-white rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-1 focus:ring-[#D4FF00] placeholder-gray-500" />
+        <input type="text" placeholder="Cari event, artis, kota..." class="w-full bg-[#1A1825] text-sm text-white rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-1 focus:ring-[#D4FF00] placeholder-gray-500" />
     </div>
 
     <!-- Filter Pills -->
@@ -83,7 +83,7 @@
                 <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                 </svg>
-                Verified
+                Terverifikasi
               </span>
             </div>
 

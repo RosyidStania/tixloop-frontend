@@ -19,7 +19,7 @@
 
   function applyFilter() {
     let count = 0;
-    if (activeLocation !== 'All') count++;
+    if (activeLocation !== 'all') count++;
     if (activeDate !== 'Any') count++;
     if (verifiedOnly) count++;
     if (nearEvent) count++;

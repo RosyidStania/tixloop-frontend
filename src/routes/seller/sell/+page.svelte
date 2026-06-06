@@ -2,11 +2,40 @@
   import { goto } from '$app/navigation';
   import BottomNav from '$lib/components/seller/layout/BottomNav.svelte';
   import { ticketService } from '$lib/services/ticketService';
+  import { marketplaceService } from '$lib/services/marketplaceService';
+  import { onMount } from 'svelte';
 
   let uploadedFile = $state(null);
   let uploadedPreview = $state(null);
   let isDragging = $state(false);
+  
+  // Events Data
+  const EVENTS = [
+    { id: '01kt8ttsxv2s34tj99zrsjbz67', name: 'Coldplay Jakarta' },
+    { id: '01kt8ttsy2dd4783y8ac3azwzn', name: 'Djakarta Warehouse Project' },
+    { id: '01kt8ttsy736vbfxrwngjfzcp1', name: 'Indonesia vs Argentina' },
+    { id: '01kt8ttsybj679mra4zzdvw39k', name: 'AI & Future Tech Summit' },
+    { id: '01kt8ttsyfermbgdwbwb1gbgwn', name: 'Taylor Swift Redux' }
+  ];
+
+  let eventSearchQuery = $state('');
+  let isEventDropdownOpen = $state(false);
+  let selectedEvent = $state(null);
+
+  let filteredEvents = $derived(
+    EVENTS.filter(e => e.name.toLowerCase().includes(eventSearchQuery.toLowerCase()))
+  );
+
+  function selectEvent(ev) {
+    selectedEvent = ev;
+    eventSearchQuery = ev.name;
+    isEventDropdownOpen = false;
+  }
+  
+  let ticketCode = $state('');
+  let hargaBeli = $state('');
   let hargaJual = $state('');
+  
   let autoDrop = $state(true);
   let isPublishing = $state(false);
 
@@ -34,28 +63,54 @@
     uploadedPreview = null;
   }
 
-  function handleHargaInput(e) {
+  function handleHargaJualInput(e) {
     const digits = e.target.value.replace(/\D/g, '');
     hargaJual = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
-  const canPublish = $derived(uploadedFile !== null && hargaJual.length > 0);
+  function handleHargaBeliInput(e) {
+    const digits = e.target.value.replace(/\D/g, '');
+    hargaBeli = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  let canPublish = $derived(
+    uploadedFile !== null && 
+    hargaJual.length > 0 &&
+    hargaBeli.length > 0 &&
+    selectedEvent !== null &&
+    ticketCode.trim().length > 0
+  );
 
   async function handlePublish() {
     if (!canPublish || isPublishing) return;
     isPublishing = true;
     try {
+      // 1. Upload Ticket
       const formData = new FormData();
       formData.append('ticket_proof', uploadedFile);
-      formData.append('original_price', hargaJual.replace(/\./g, ''));
-      formData.append('event_id', '01kt65r7srvgnna8fk17khtdhw'); // Default dummy event ID
-      formData.append('ticket_code', 'TIX-' + Math.floor(Math.random() * 100000));
+      formData.append('original_price', hargaBeli.replace(/\./g, ''));
+      formData.append('event_id', selectedEvent.id);
+      formData.append('ticket_code', ticketCode.trim());
       
-      await ticketService.uploadTicket(formData);
-      goto('/seller/listings');
+      const uploadRes = await ticketService.uploadTicket(formData);
+      
+      if (uploadRes.success) {
+        const ticketId = uploadRes.data.id;
+        
+        // 2. Create Marketplace Listing
+        await marketplaceService.createListing({
+          ticket_id: ticketId,
+          current_asking_price: hargaJual.replace(/\./g, '')
+        });
+        
+        goto('/seller/listings');
+      } else {
+        alert(uploadRes.message || 'Gagal mengupload tiket');
+      }
     } catch (error) {
       console.error(error);
-      alert('Gagal mengupload tiket');
+      const errMsg = error.response?.data?.message || 'Terjadi kesalahan sistem';
+      alert(errMsg);
     } finally {
       isPublishing = false;
     }
@@ -153,6 +208,68 @@
       </button>
     </div>
 
+    <!-- Event ID & Ticket Code -->
+    <div class="space-y-3">
+      <div class="relative">
+        <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-1">Event (Pilih Acara)</p>
+        <div class="bg-[#14121E] border border-[#232033] rounded-xl flex items-center px-4 py-3.5 focus-within:border-[#AAEF45]/40 transition-colors">
+          <input
+            type="text"
+            placeholder="Cari event..."
+            bind:value={eventSearchQuery}
+            onfocus={() => isEventDropdownOpen = true}
+            oninput={() => { selectedEvent = null; isEventDropdownOpen = true; }}
+            class="flex-1 bg-transparent text-sm font-bold text-white placeholder-gray-600 outline-none"
+          />
+          {#if selectedEvent}
+            <svg class="w-4 h-4 text-[#AAEF45] shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          {/if}
+        </div>
+        {#if isEventDropdownOpen && filteredEvents.length > 0}
+          <div class="absolute z-10 w-full mt-1 bg-[#1A1825] border border-[#232033] rounded-xl overflow-hidden shadow-xl max-h-48 overflow-y-auto">
+            {#each filteredEvents as ev}
+              <button
+                type="button"
+                class="w-full text-left px-4 py-3 text-sm font-bold text-white hover:bg-[#AAEF45]/10 hover:text-[#AAEF45] transition-colors border-b border-[#232033] last:border-b-0"
+                onclick={() => selectEvent(ev)}
+              >
+                {ev.name}
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+      <div>
+        <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-1">Kode Tiket (Barcode/Voucher)</p>
+        <div class="bg-[#14121E] border border-[#232033] rounded-xl flex items-center px-4 py-3.5 focus-within:border-[#AAEF45]/40 transition-colors">
+          <input
+            type="text"
+            placeholder="TIX-..."
+            bind:value={ticketCode}
+            class="flex-1 bg-transparent text-sm font-bold text-white placeholder-gray-600 outline-none"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Harga Beli -->
+    <div>
+      <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-2">Harga Beli (Asli)</p>
+      <div class="bg-[#14121E] border border-[#232033] rounded-xl flex items-center px-4 py-3.5 focus-within:border-[#AAEF45]/40 transition-colors">
+        <span class="text-sm font-bold text-gray-500 shrink-0 mr-3">Rp</span>
+        <input
+          type="text"
+          inputmode="numeric"
+          placeholder="0"
+          value={hargaBeli}
+          oninput={handleHargaBeliInput}
+          class="flex-1 bg-transparent text-sm font-bold text-white placeholder-gray-600 outline-none"
+        />
+      </div>
+    </div>
+
     <!-- Harga Jual -->
     <div>
       <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-2">Harga Jual</p>
@@ -163,7 +280,7 @@
           inputmode="numeric"
           placeholder="0"
           value={hargaJual}
-          oninput={handleHargaInput}
+          oninput={handleHargaJualInput}
           class="flex-1 bg-transparent text-sm font-bold text-white placeholder-gray-600 outline-none"
         />
       </div>

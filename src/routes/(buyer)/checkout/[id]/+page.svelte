@@ -88,7 +88,7 @@
     <div class="bg-[#14121E] p-4 rounded-2xl border border-[#232033]">
       <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-3">RINGKASAN PESANAN</p>
       <div class="flex gap-3 mb-4">
-        <img src="https://images.unsplash.com/photo-1540039155733-d7696d54af58?w=100&h=100&fit=crop" class="w-16 h-16 rounded-xl object-cover" alt="Event" />
+        <img src={listing.ticket.event.event_poster_url || listing.ticket.event.poster_url || "https://images.unsplash.com/photo-1540039155733-d7696d54af58?w=100&h=100&fit=crop"} class="w-16 h-16 rounded-xl object-cover" alt={listing.ticket.event.name || 'Event'} />
         <div>
           <h3 class="font-bold text-sm mb-1">{listing.ticket.event.name}</h3>
           <p class="text-xs text-gray-400 mb-2">{listing.ticket.metadata?.type || 'General'} • {listing.ticket.metadata?.gate || '-'}</p>
