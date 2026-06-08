@@ -1,8 +1,8 @@
 <script>
   import { goto } from '$app/navigation';
   import BottomNav from '$lib/components/seller/layout/BottomNav.svelte';
-  import { ticketService } from '$lib/services/ticketService';
-  import { marketplaceService } from '$lib/services/marketplaceService';
+  import { ticketService } from '$lib/services/api/ticketService';
+  import { marketplaceService } from '$lib/services/api/marketplaceService';
   import { onMount } from 'svelte';
 
   let uploadedFile = $state(null);

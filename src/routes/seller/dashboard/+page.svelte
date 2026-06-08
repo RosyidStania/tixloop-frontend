@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import BottomNav from '$lib/components/seller/layout/BottomNav.svelte';
-  import { dashboardService } from '$lib/services/dashboardService';
+  import { dashboardService } from '$lib/services/api/dashboardService';
 
   let isLoading = $state(true);
   let burnPreventionData = $state(null);

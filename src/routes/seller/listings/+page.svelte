@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import BottomNav from '$lib/components/seller/layout/BottomNav.svelte';
-  import { ticketService } from '$lib/services/ticketService';
+  import { ticketService } from '$lib/services/api/ticketService';
 
   let activeFilter = $state('draft'); // Pindah tab default ke Pending (draft)
   let isLoading = $state(true);

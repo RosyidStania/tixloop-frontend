@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import BottomNav from '$lib/components/seller/layout/BottomNav.svelte';
-  import { ticketService } from '$lib/services/ticketService';
+  import { ticketService } from '$lib/services/api/ticketService';
 
   // State untuk listing
   let listing = $state({
