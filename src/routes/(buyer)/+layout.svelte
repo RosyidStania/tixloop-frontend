@@ -11,17 +11,17 @@
 			const token = localStorage.getItem('token');
 			const currentPath = $page.url.pathname;
 			
-			const publicPaths = ['/login', '/register'];
-			const isPublicPath = publicPaths.includes(currentPath);
+			const isAuthPath = ['/login', '/register'].includes(currentPath);
 
-			// Jika tidak ada token dan bukan di halaman publik, redirect ke login
-			if (!token && !isPublicPath) {
-				goto('/login');
+			// Jika sudah login tapi buka halaman login/register, redirect ke beranda (/)
+			if (token && isAuthPath) {
+				goto('/');
 			}
-
-			// Jika sudah login tapi buka halaman login/register, redirect ke home
-			if (token && isPublicPath) {
-				goto('/home');
+			
+			// Halaman checkout, my-ticket, refund mewajibkan login
+			const requiresAuth = currentPath.startsWith('/checkout') || currentPath.startsWith('/my-ticket') || currentPath.startsWith('/refund') || currentPath.startsWith('/invoice');
+			if (!token && requiresAuth) {
+				goto('/login');
 			}
 		}
 	});

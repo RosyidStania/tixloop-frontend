@@ -101,7 +101,7 @@
     </div>
   </div>
 
-  <div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#232033] p-4 z-40 pb-safe">
+  <div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#232033] p-4 z-40 pb-[env(safe-area-inset-bottom,1rem)]">
     <div class="flex gap-3">
       <button class="flex-1 border border-[#232033] bg-transparent text-white text-xs font-bold py-3.5 rounded-xl transition-transform active:scale-95">
         Batalkan Refund
@@ -114,6 +114,3 @@
   </div>
 </main>
 
-<style>
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
-</style>

@@ -8,12 +8,21 @@
   import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
 
   let listings = $state([]);
+  let dealsListings = $state([]);
   let isLoading = $state(true);
 
   onMount(async () => {
     try {
-      const response = await api.get('/marketplace/listings?per_page=50');
-      listings = response.data.data || response.data || [];
+      const [resAll, resDeals] = await Promise.all([
+        api.get('/marketplace/listings?per_page=50'),
+        api.get('/marketplace/listings?deals=true&per_page=10')
+      ]);
+      
+      let allListings = resAll.data.data || resAll.data || [];
+      let allDeals = resDeals.data.data || resDeals.data || [];
+      
+      listings = allListings;
+      dealsListings = allDeals;
     } catch (error) {
       console.error('Failed to load listings', error);
     } finally {
@@ -31,7 +40,9 @@
         <div class="w-8 h-8 border-4 border-[#D4FF00] border-t-transparent rounded-full animate-spin"></div>
       </div>
     {:else}
-      <LastMinuteDeals {listings} />
+      {#if dealsListings.length > 0}
+        <LastMinuteDeals listings={dealsListings} />
+      {/if}
 
       <Trending {listings} />
 

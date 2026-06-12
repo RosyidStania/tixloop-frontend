@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import api from '$lib/axios';
+  import { resolveImageUrl } from '$lib/utils/image';
 
   let listingId = $page.params.id;
   let listing = $state(null);
@@ -29,7 +30,7 @@
   </div>
 {:else if listing}
 <main class="bg-[#0A0910] min-h-screen text-white font-sans pb-32">
-  <div class="relative h-72 bg-cover bg-center" style="background-image: url('{listing.ticket.event.event_poster_url || listing.ticket.event.poster_url || 'https://images.unsplash.com/photo-1540039155733-d7696d54af58?q=80&w=800&auto=format&fit=crop'}');">
+  <div class="relative h-72 bg-cover bg-center" style="background-image: url('{resolveImageUrl(listing.ticket.event.event_poster_url)}');">
     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-[#0A0910]"></div>
     
     <div class="absolute top-0 w-full px-4 pt-12 flex justify-between items-center z-10">
@@ -47,9 +48,12 @@
     </div>
 
     <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-      <div class="flex gap-2">
+      <div class="flex flex-wrap gap-2">
         {#if listing.verification_status === 'verified'}
           <span class="bg-[#D4FF00] text-black text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1"><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg> Verified</span>
+        {/if}
+        {#if listing.is_auto_drop}
+          <span class="bg-[#FF3366] text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">⚡ Deals</span>
         {/if}
         <span class="bg-[#C7A4FF] text-black text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">📈 Trending</span>
       </div>
@@ -125,7 +129,7 @@
     </div>
   </div>
 
-  <div class="fixed bottom-0 w-full bg-[#0A0910] border-t border-[#232033] p-4 z-40 pb-safe shadow-[0_-10px_20px_-5px_rgba(10,9,16,0.9)]">
+  <div class="fixed bottom-0 w-full bg-[#0A0910] border-t border-[#232033] p-4 z-40 pb-[env(safe-area-inset-bottom,1rem)] shadow-[0_-10px_20px_-5px_rgba(10,9,16,0.9)]">
     <div class="flex justify-between items-center mb-3">
       <div>
         <p class="text-[10px] text-gray-400">Harga Jual</p>
@@ -149,13 +153,10 @@
 </main>
 {:else}
   <div class="flex flex-col justify-center items-center min-h-screen bg-[#0A0910] text-white">
-    <svg class="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <svg class="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2z"></path></svg>
     <h2 class="text-xl font-bold mb-2">Tiket Tidak Ditemukan</h2>
     <p class="text-gray-400 text-sm mb-6">Listing mungkin sudah kadaluarsa atau ditarik.</p>
     <a href="/explore" class="bg-[#2D234A] text-white px-6 py-2 rounded-full text-sm font-semibold">Kembali ke Explore</a>
   </div>
 {/if}
 
-<style>
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
-</style>

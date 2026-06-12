@@ -43,5 +43,16 @@ export const marketplaceService = {
       console.error('Error on checkout:', error);
       throw error;
     }
+  },
+
+  // 5. My Listings
+  getMyListings: async (params = {}) => {
+    try {
+      const response = await api.get('/marketplace/my-listings', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching my listings:', error);
+      throw error;
+    }
   }
 };

@@ -1,25 +1,96 @@
 <script>
-  // State Svelte 5 untuk mengontrol visibilitas QR Code
-  let showQR = $state(false);
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import api from '$lib/axios';
+  import { resolveImageUrl } from '$lib/utils/image';
 
-  const ticket = {
-    id: 'TIX-2026-10132',
-    status: 'Dikonfirmasi',
-    eventName: 'Cold Play 2026',
-    category: 'General Admission',
-    date: 'June 15, 2026',
-    time: '18:00 WIB',
-    venue: 'Jakarta Convention Center',
-    city: 'Jakarta',
-    gate: 'Gate A — Utara',
-    area: 'Zona 3 — Festival',
-    countdown: '25d lagi',
-    price: 'Rp 450.000',
-    escrowStatus: 'Dana Terkirim',
-    image: 'https://images.unsplash.com/photo-1540039155733-d7696d54af58?w=800&auto=format&fit=crop&q=80'
-  };
+  let ticketId = $page.params.id;
+  let ticket = $state(null);
+  let isLoading = $state(true);
+  let showQR = $state(false);
+  let transactionId = $state(null);
+  let isEscrowReleased = $state(false);
+  let isReleasing = $state(false);
+  let debugTx = $state('');
+
+  onMount(async () => {
+    try {
+      const res = await api.get(`/tickets/${ticketId}`);
+      const t = res.data.data || res.data;
+      
+      const eventDate = new Date(t.event?.event_datetime);
+      const diffTime = Math.abs(eventDate - new Date());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      ticket = {
+        id: t.id,
+        ticketCode: t.ticket_code || t.id,
+        status: t.status === 'aktif' ? 'Dikonfirmasi' : t.status,
+        eventName: t.event?.event_name || 'Event',
+        category: t.ticket_metadata?.type || 'General Admission',
+        date: eventDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        time: eventDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+        venue: t.event?.venue_name || 'Venue',
+        city: t.event?.city || 'City',
+        gate: t.ticket_metadata?.gate || '-',
+        area: t.seat_number ? `Seat: ${t.seat_number}` : 'Festival',
+        countdown: `${diffDays}d lagi`,
+        price: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(t.ticket_metadata?.original_price || 0),
+        escrowStatus: 'Dana Ditahan',
+
+        image: resolveImageUrl(t.event?.event_poster_url),
+        proofImage: null
+      };
+
+      try {
+        const photoRes = await api.get(`/tickets/${t.id}/physical-photo`, { responseType: 'blob' });
+        ticket.proofImage = URL.createObjectURL(photoRes.data);
+      } catch (err) {
+        console.warn('Gagal memuat physical photo, mencoba invoice proof...', err);
+        try {
+          const proofRes = await api.get(`/tickets/${t.id}/proof`, { responseType: 'blob' });
+          ticket.proofImage = URL.createObjectURL(proofRes.data);
+        } catch (err2) {
+          console.warn('Gagal memuat kedua gambar tiket:', err2);
+        }
+      }
+      try {
+        const txRes = await api.get('/transactions');
+        const txData = txRes.data.data || txRes.data;
+        
+        let found = null;
+        if (Array.isArray(txData)) {
+          found = txData.find(tx => String(tx.ticket_id) === String(t.id) || (tx.ticket && String(tx.ticket.id) === String(t.id)));
+          if (found) {
+            transactionId = found.id;
+            if (found.status === 'completed') {
+              isEscrowReleased = true;
+              ticket.escrowStatus = 'Dana Diteruskan';
+            }
+          } else {
+            debugTx = `Tx array length: ${txData.length}. No tx found for ticket_id=${t.id}`;
+          }
+        } else {
+          debugTx = `txData is not an array: ${typeof txData}`;
+        }
+      } catch (err) {
+        debugTx = `Error fetching /transactions: ${err.message}`;
+        console.warn('Gagal fetch data transaksi untuk status escrow:', err);
+      }
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isLoading = false;
+    }
+  });
 </script>
 
+{#if isLoading}
+  <div class="flex justify-center items-center min-h-screen bg-[#0A0910]">
+    <div class="w-8 h-8 border-4 border-[#D4FF00] border-t-transparent rounded-full animate-spin"></div>
+  </div>
+{:else if ticket}
 <main class="bg-[#0A0910] min-h-screen text-white font-sans pb-12 overflow-x-hidden">
   <div class="fixed top-0 w-full px-4 pt-12 pb-4 flex justify-between items-center z-50 bg-gradient-to-b from-[#0A0910]/90 to-transparent">
     <a href="javascript:history.back()" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center transition-transform active:scale-95">
@@ -100,29 +171,33 @@
 
       {#if showQR}
         <div class="flex flex-col items-center pb-8 px-4 transition-all duration-300">
-          <div class="bg-white p-4 rounded-3xl mb-4 w-48 h-48 flex items-center justify-center shadow-[0_0_20px_rgba(212,255,0,0.2)]">
-            <svg class="w-full h-full text-black" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v2h-3v-2zm-4-2h2v5h-2v-5zm4 3h2v2h-2v-2zm-6-5h2v2h-2v-2z" />
-            </svg>
+          <div class="bg-white p-2 rounded-xl mb-4 w-full flex items-center justify-center shadow-[0_0_20px_rgba(212,255,0,0.2)] overflow-hidden">
+            {#if ticket.proofImage}
+              <img src={ticket.proofImage} alt="Bukti Tiket" class="w-full h-auto object-contain max-h-[300px]" />
+            {:else}
+              <div class="w-48 h-48 flex items-center justify-center">
+                <p class="text-xs text-gray-500">Gambar tiket tidak tersedia</p>
+              </div>
+            {/if}
           </div>
           
           <div class="flex items-center gap-2 bg-[#1A1825] px-4 py-2 rounded-xl mb-4">
-            <span class="text-[#D4FF00] font-mono font-bold text-sm tracking-wider">{ticket.id}</span>
+            <span class="text-[#D4FF00] font-mono font-bold text-sm tracking-wider">{ticket.ticketCode}</span>
           </div>
 
           <button onclick={() => showQR = false} class="text-[11px] text-gray-400 hover:text-white underline underline-offset-2 transition-colors">
-            Sembunyikan QR Code
+            Sembunyikan E-Tiket
           </button>
         </div>
       {:else}
         <div class="flex flex-col items-center pb-6 px-5 transition-all duration-300">
-          <p class="text-[11px] text-gray-400 mb-3">Tunjukkan QR ini ke Petugas Scan</p>
+          <p class="text-[11px] text-gray-400 mb-3">Tunjukkan E-Tiket ini ke Petugas Scan</p>
           <button onclick={() => showQR = true} class="w-full bg-[#D4FF00] text-[#0A0910] text-sm font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-[0_4px_15px_rgba(212,255,0,0.15)]">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            Lihat Tiket QR
+            Lihat E-Tiket
           </button>
         </div>
       {/if}
@@ -163,6 +238,17 @@
     </div>
   </div>
 
+  {#if debugTx && !transactionId}
+    <div class="px-4 mb-4 mt-2">
+      <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-[10px] text-red-400 font-mono break-all">
+        DEBUG: {debugTx} <br/>
+        ticket_id yang dicari: {ticketId}
+      </div>
+    </div>
+  {/if}
+
+
+
   <div class="px-4 pb-8 mt-4">
     <a href="/refund/form/{ticket.id}" class="w-full bg-[#3E1A25]/30 border border-[#FF3366]/20 text-[#FF3366] text-xs font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 hover:bg-[#3E1A25]/50">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -171,3 +257,4 @@
   </div>
 
 </main>
+{/if}

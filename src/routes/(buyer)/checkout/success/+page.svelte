@@ -91,7 +91,7 @@
       Dilindungi TixLoop
     </div>
 
-    <div class="space-y-3 mt-auto pb-safe">
+    <div class="space-y-3 mt-auto pb-[env(safe-area-inset-bottom,1rem)]">
       <a href="/activity" class="w-full bg-[#D4FF00] text-black font-bold py-3.5 rounded-xl flex justify-center items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
         Lihat Tiket Saya
@@ -104,13 +104,10 @@
   </main>
 {:else}
   <div class="flex flex-col justify-center items-center min-h-screen bg-[#0A0910] text-white">
-    <svg class="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <svg class="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2z"></path></svg>
     <h2 class="text-xl font-bold mb-2">Gagal Memuat</h2>
     <p class="text-gray-400 text-sm mb-6">{errorMsg || 'Transaksi tidak ditemukan.'}</p>
     <a href="/explore" class="bg-[#2D234A] text-white px-6 py-2 rounded-full text-sm font-semibold">Kembali ke Explore</a>
   </div>
 {/if}
 
-<style>
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
-</style>

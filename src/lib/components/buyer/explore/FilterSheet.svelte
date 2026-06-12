@@ -15,14 +15,28 @@
   // Tambahkan $state()
   let verifiedOnly = $state(false);
   let nearEvent = $state(false);
+  let minPrice = $state(0);
   let maxPrice = $state(1500000);
+
+  const pricePresets = [
+    { label: '< Rp 500rb', min: 0, max: 500000 },
+    { label: 'Rp 500rb - 1Jt', min: 500000, max: 1000000 },
+    { label: 'Rp 1Jt - 2Jt', min: 1000000, max: 2000000 },
+    { label: '> Rp 2Jt', min: 2000000, max: 10000000 }
+  ];
+
+  function applyPreset(preset) {
+    minPrice = preset.min;
+    maxPrice = preset.max;
+  }
 
   function applyFilter() {
     let count = 0;
-    if (activeLocation !== 'all') count++;
+    if (activeLocation !== 'All') count++;
     if (activeDate !== 'Any') count++;
     if (verifiedOnly) count++;
     if (nearEvent) count++;
+    if (minPrice > 0 || maxPrice < 1500000) count++;
     
     dispatch('apply', { 
       count, 
@@ -31,6 +45,7 @@
         activeDate,
         verifiedOnly,
         nearEvent,
+        minPrice,
         maxPrice
       } 
     });
@@ -43,14 +58,14 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 bg-black/60 z-50 transition-opacity" on:click={close}></div>
+  <div class="fixed inset-0 bg-black/60 z-50 transition-opacity" onclick={close}></div>
   
   <div class="fixed bottom-0 w-full bg-[#1A1825] rounded-t-3xl p-6 z-50 transform transition-transform duration-300">
     <div class="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-6"></div>
     
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-bold text-white">Filter</h2>
-      <button on:click={close} class="w-8 h-8 bg-[#232033] rounded-full flex items-center justify-center text-gray-400">
+      <button onclick={close} class="w-8 h-8 bg-[#232033] rounded-full flex items-center justify-center text-gray-400">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
@@ -58,12 +73,27 @@
     <div class="mb-6">
       <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2">
         <svg class="w-4 h-4 text-[#D4FF00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-        Harga Maksimal
+        Rentang Harga
       </h3>
-      <input type="range" min="200000" max="1500000" bind:value={maxPrice} class="w-full accent-[#D4FF00] h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" />
-      <div class="flex justify-between text-xs text-gray-400 mt-2">
-        <span>Rp 200.000</span>
-        <span>Rp 1.500.000</span>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <div class="relative flex-1">
+          <span class="absolute left-3 top-3 text-sm text-gray-500 font-bold">Rp</span>
+          <input type="number" bind:value={minPrice} placeholder="MIN" class="w-full bg-[#232033] border border-[#2D234A] rounded-xl py-2.5 pl-10 pr-3 text-sm font-semibold text-white focus:outline-none focus:border-[#D4FF00] transition-colors [&::-webkit-inner-spin-button]:appearance-none" />
+        </div>
+        <span class="text-gray-500 font-bold">-</span>
+        <div class="relative flex-1">
+          <span class="absolute left-3 top-3 text-sm text-gray-500 font-bold">Rp</span>
+          <input type="number" bind:value={maxPrice} placeholder="MAX" class="w-full bg-[#232033] border border-[#2D234A] rounded-xl py-2.5 pl-10 pr-3 text-sm font-semibold text-white focus:outline-none focus:border-[#D4FF00] transition-colors [&::-webkit-inner-spin-button]:appearance-none" />
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap gap-2">
+        {#each pricePresets as preset}
+          <button onclick={() => applyPreset(preset)} class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all active:scale-95 {minPrice === preset.min && maxPrice === preset.max ? 'bg-[#D4FF00] text-black border-[#D4FF00]' : 'bg-[#1A1825] text-gray-400 border-[#232033]'}">
+            {preset.label}
+          </button>
+        {/each}
       </div>
     </div>
 
@@ -74,7 +104,7 @@
       </h3>
       <div class="flex flex-wrap gap-2">
         {#each locations as loc}
-          <button on:click={() => activeLocation = loc} class="px-4 py-1.5 rounded-full text-xs font-medium border {activeLocation === loc ? 'bg-[#C7A4FF] text-black border-[#C7A4FF]' : 'bg-[#232033] text-gray-300 border-[#2D234A]'}">{loc}</button>
+          <button onclick={() => activeLocation = loc} class="px-4 py-1.5 rounded-full text-xs font-medium border {activeLocation === loc ? 'bg-[#C7A4FF] text-black border-[#C7A4FF]' : 'bg-[#232033] text-gray-300 border-[#2D234A]'}">{loc}</button>
         {/each}
       </div>
     </div>
@@ -86,7 +116,7 @@
       </h3>
       <div class="flex flex-wrap gap-2">
         {#each dates as date}
-          <button on:click={() => activeDate = date} class="px-4 py-1.5 rounded-full text-xs font-medium border {activeDate === date ? 'bg-[#FF8A00] text-black border-[#FF8A00]' : 'bg-[#232033] text-gray-300 border-[#2D234A]'}">{date}</button>
+          <button onclick={() => activeDate = date} class="px-4 py-1.5 rounded-full text-xs font-medium border {activeDate === date ? 'bg-[#FF8A00] text-black border-[#FF8A00]' : 'bg-[#232033] text-gray-300 border-[#2D234A]'}">{date}</button>
         {/each}
       </div>
     </div>
@@ -94,19 +124,19 @@
     <div class="space-y-4 mb-8">
       <div class="flex justify-between items-center">
         <span class="text-sm text-gray-300 flex items-center gap-2"><svg class="w-4 h-4 text-[#D4FF00]" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg> Verified Only</span>
-        <button on:click={() => verifiedOnly = !verifiedOnly} class="w-11 h-6 rounded-full relative transition-colors {verifiedOnly ? 'bg-[#D4FF00]' : 'bg-gray-600'}">
+        <button onclick={() => verifiedOnly = !verifiedOnly} class="w-11 h-6 rounded-full relative transition-colors {verifiedOnly ? 'bg-[#D4FF00]' : 'bg-gray-600'}">
           <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform {verifiedOnly ? 'translate-x-5' : 'translate-x-0.5'}"></div>
         </button>
       </div>
       <div class="flex justify-between items-center">
         <span class="text-sm text-gray-300 flex items-center gap-2"><svg class="w-4 h-4 text-[#FF8A00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Near Event</span>
-        <button on:click={() => nearEvent = !nearEvent} class="w-11 h-6 rounded-full relative transition-colors {nearEvent ? 'bg-[#D4FF00]' : 'bg-gray-600'}">
+        <button onclick={() => nearEvent = !nearEvent} class="w-11 h-6 rounded-full relative transition-colors {nearEvent ? 'bg-[#D4FF00]' : 'bg-gray-600'}">
           <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform {nearEvent ? 'translate-x-5' : 'translate-x-0.5'}"></div>
         </button>
       </div>
     </div>
 
-    <button on:click={applyFilter} class="w-full bg-[#D4FF00] text-black font-bold py-3.5 rounded-xl mb-4">
+    <button onclick={applyFilter} class="w-full bg-[#D4FF00] text-black font-bold py-3.5 rounded-xl mb-4">
       Terapkan Filter
     </button>
   </div>

@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import BottomNav from '$lib/components/buyer/layout/BottomNav.svelte';
   import api from '$lib/axios';
+  import { showToast } from '$lib/stores/toast.svelte.js';
 
   let user = $state({
     name: 'Memuat...',
@@ -11,8 +12,22 @@
     avatar: '?',
     verified: false
   });
+  let isGuest = $state(false);
 
   onMount(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      isGuest = true;
+      user = {
+        name: 'Tamu',
+        email: 'Silakan login terlebih dahulu',
+        joined: '-',
+        avatar: '?',
+        verified: false
+      };
+      return;
+    }
+
     try {
       const response = await api.get('/auth/me');
       const userData = response.data.data.user || response.data.data;
@@ -27,7 +42,9 @@
     } catch (error) {
       console.error('Failed to fetch profile:', error);
       if (error.response?.status === 401) {
-        goto('/login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        isGuest = true;
       }
     }
   });
@@ -86,7 +103,7 @@
 
   <!-- Header -->
   <div class="px-4 pt-12 pb-3 flex items-center justify-between">
-    <h1 class="text-xl font-black">Profil</h1>
+    <h1 class="text-2xl font-black text-white tracking-tight">Profil</h1>
     <button class="w-9 h-9 bg-[#1A1825] rounded-full flex items-center justify-center relative active:scale-95 transition-transform">
       <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -120,32 +137,46 @@
     </div>
 
     <!-- Switch to Seller CTA -->
-    <button
-      onclick={handleSwitchToSeller}
-      disabled={isSwitching}
-      class="w-full bg-[#AAEF45]/10 border border-[#AAEF45]/25 rounded-2xl py-3.5 flex items-center justify-center gap-2 active:scale-[0.98] transition-all {isSwitching ? 'opacity-70' : ''}"
-    >
-      {#if isSwitching}
-        <!-- Spinner -->
-        <svg class="w-4 h-4 text-[#AAEF45] animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-        </svg>
-        <span class="text-sm font-bold text-[#AAEF45]">Beralih...</span>
-      {:else}
-        <svg class="w-4 h-4 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-        </svg>
-        <span class="text-sm font-bold text-[#AAEF45]">Beralih Sebagai Penjual</span>
-      {/if}
-    </button>
+    {#if isGuest}
+      <a
+        href="/login"
+        class="block w-full bg-[#AAEF45]/10 border border-[#AAEF45]/25 rounded-2xl py-3.5 text-center active:scale-[0.98] transition-all"
+      >
+        <div class="flex items-center justify-center gap-2">
+          <svg class="w-4 h-4 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+          </svg>
+          <span class="text-sm font-bold text-[#AAEF45]">Mohon Login</span>
+        </div>
+      </a>
+    {:else}
+      <button
+        onclick={handleSwitchToSeller}
+        disabled={isSwitching}
+        class="w-full bg-[#AAEF45]/10 border border-[#AAEF45]/25 rounded-2xl py-3.5 flex items-center justify-center gap-2 active:scale-[0.98] transition-all {isSwitching ? 'opacity-70' : ''}"
+      >
+        {#if isSwitching}
+          <!-- Spinner -->
+          <svg class="w-4 h-4 text-[#AAEF45] animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span class="text-sm font-bold text-[#AAEF45]">Beralih...</span>
+        {:else}
+          <svg class="w-4 h-4 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          <span class="text-sm font-bold text-[#AAEF45]">Beralih Sebagai Penjual</span>
+        {/if}
+      </button>
+    {/if}
 
     <!-- Verifikasi Akun -->
     <div>
       <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-3">Verifikasi Akun</p>
       <div class="bg-[#14121E] border border-[#232033] rounded-2xl overflow-hidden">
         {#each verifikasi as item, i}
-          <button class="w-full flex items-center gap-3 px-4 py-3.5 active:bg-[#1A1825] transition-colors {i < verifikasi.length - 1 ? 'border-b border-[#1E1C2E]' : ''}">
+          <button onclick={() => showToast('Fitur ini akan segera hadir!', 'info')} class="w-full flex items-center gap-3 px-4 py-3.5 active:bg-[#1A1825] transition-colors {i < verifikasi.length - 1 ? 'border-b border-[#1E1C2E]' : ''}">
             <div class="w-8 h-8 rounded-xl bg-[#1A1825] flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 {@html item.icon}
@@ -163,7 +194,7 @@
     </div>
 
     <!-- Verifikasi Identitas banner -->
-    <button class="w-full bg-[#14121E] border border-[#AAEF45]/20 rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition-transform">
+    <button onclick={() => showToast('Fitur ini akan segera hadir!', 'info')} class="w-full bg-[#14121E] border border-[#AAEF45]/20 rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition-transform">
       <div class="w-10 h-10 rounded-xl bg-[#AAEF45]/10 border border-[#AAEF45]/20 flex items-center justify-center shrink-0">
         <svg class="w-5 h-5 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -184,7 +215,7 @@
       <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-3">Pengaturan</p>
       <div class="bg-[#14121E] border border-[#232033] rounded-2xl overflow-hidden">
         {#each pengaturan as item, i}
-          <button class="w-full flex items-center gap-3 px-4 py-3.5 active:bg-[#1A1825] transition-colors {i < pengaturan.length - 1 ? 'border-b border-[#1E1C2E]' : ''}">
+          <button onclick={() => showToast('Fitur ini akan segera hadir!', 'info')} class="w-full flex items-center gap-3 px-4 py-3.5 active:bg-[#1A1825] transition-colors {i < pengaturan.length - 1 ? 'border-b border-[#1E1C2E]' : ''}">
             <div class="w-8 h-8 rounded-xl {item.bg} flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 {item.color}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 {@html item.icon}
@@ -207,7 +238,7 @@
       <p class="text-[11px] font-black text-gray-500 tracking-widest uppercase mb-3">Bantuan</p>
       <div class="bg-[#14121E] border border-[#232033] rounded-2xl overflow-hidden">
         {#each bantuan as item, i}
-          <button class="w-full flex items-center gap-3 px-4 py-3.5 active:bg-[#1A1825] transition-colors {i < bantuan.length - 1 ? 'border-b border-[#1E1C2E]' : ''}">
+          <button onclick={() => showToast('Fitur ini akan segera hadir!', 'info')} class="w-full flex items-center gap-3 px-4 py-3.5 active:bg-[#1A1825] transition-colors {i < bantuan.length - 1 ? 'border-b border-[#1E1C2E]' : ''}">
             <div class="w-8 h-8 rounded-xl bg-[#1A1825] flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 {@html item.icon}
@@ -222,13 +253,23 @@
       </div>
     </div>
 
-    <!-- Keluar -->
-    <button
-      onclick={() => showLogoutConfirm = true}
-      class="w-full py-3.5 rounded-2xl border border-red-500/30 bg-red-500/5 text-red-400 text-sm font-bold active:scale-[0.98] transition-transform"
-    >
-      Keluar dari Akun
-    </button>
+    {#if isGuest}
+      <!-- Login -->
+      <a
+        href="/login"
+        class="block w-full py-3.5 rounded-2xl border border-[#AAEF45]/30 bg-[#AAEF45]/10 text-[#AAEF45] text-center text-sm font-bold active:scale-[0.98] transition-transform"
+      >
+        Masuk ke Akun
+      </a>
+    {:else}
+      <!-- Keluar -->
+      <button
+        onclick={() => showLogoutConfirm = true}
+        class="w-full py-3.5 rounded-2xl border border-red-500/30 bg-red-500/5 text-red-400 text-sm font-bold active:scale-[0.98] transition-transform"
+      >
+        Keluar dari Akun
+      </button>
+    {/if}
 
     <!-- Footer -->
     <div class="text-center pb-2">

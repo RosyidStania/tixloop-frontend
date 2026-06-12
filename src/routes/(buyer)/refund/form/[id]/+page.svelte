@@ -1,4 +1,8 @@
 <script>
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import api from '$lib/axios';
+
   let selectedReason = $state('');
   let description = $state('');
   let fileName = $state('');
@@ -9,15 +13,30 @@
   let systemChecks = $state([false, false, false, false]);
   let countdown = $state(3);
 
-  const ticket = {
-    id: 'TIX-2026-18132',
-    eventName: 'Cold Play 2026',
-    category: 'Gate A – Row J',
-    tier: 'PREMIUM',
-    totalPaid: 'Rp 400.000',
-    date: '20 Juni 2026',
-    image: 'https://images.unsplash.com/photo-1540039155733-d7696d54af58?w=800&auto=format&fit=crop&q=80'
-  };
+  let ticketId = $page.params.id;
+  let ticket = $state(null);
+  let isLoading = $state(true);
+
+  onMount(async () => {
+    try {
+      const res = await api.get(`/tickets/${ticketId}`);
+      const t = res.data.data || res.data;
+      
+      ticket = {
+        id: t.id,
+        eventName: t.event?.event_name || 'Event',
+        category: t.ticket_metadata?.type || 'General Admission',
+        tier: t.seat_number ? `Seat: ${t.seat_number}` : 'PREMIUM',
+        totalPaid: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(t.ticket_metadata?.original_price || 0),
+        date: new Date(t.event?.event_datetime).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        image: t.event?.event_poster_url || 'https://images.unsplash.com/photo-1540039155733-d7696d54af58?w=800&auto=format&fit=crop&q=80'
+      };
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isLoading = false;
+    }
+  });
 
   const reasons = [
     { id: 'barcode_invalid', label: 'Tiket invalid saat scan', desc: 'QR code tidak dapat dipindai di venue', icon: `<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>` },
@@ -112,6 +131,12 @@
     }, 11000);
   }
 </script>
+
+{#if isLoading}
+  <div class="flex justify-center items-center min-h-screen bg-[#0A0910]">
+    <div class="w-8 h-8 border-4 border-[#D4FF00] border-t-transparent rounded-full animate-spin"></div>
+  </div>
+{:else if ticket}
 
 <!-- ══════════════════ HALAMAN 1: PILIH MASALAH ══════════════════ -->
 {#if currentPage === 'select'}
@@ -259,7 +284,7 @@
   </div>
 </main>
 
-<div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#1A1825] px-4 pt-3 pb-safe z-50 space-y-2">
+<div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#1A1825] px-4 pt-3 pb-[env(safe-area-inset-bottom,1rem)] z-50 space-y-2">
   <button onclick={submitReport} class="w-full bg-[#AAEF45] text-[#0A0910] text-sm font-black py-3.5 rounded-xl flex items-center justify-center shadow-[0_4px_20px_rgba(170,239,69,0.25)] active:scale-95 transition-transform">
     Kirim Laporan
   </button>
@@ -292,7 +317,7 @@
       </div>
       <!-- Progress bar -->
       <div class="w-full bg-[#1A2510] rounded-full h-1.5 overflow-hidden">
-        <div class="h-full bg-[#AAEF45] rounded-full progress-bar" style="width: {Math.min((progressStep / 4) * 100, 75)}%"></div>
+        <div class="h-full bg-[#AAEF45] rounded-full transition-[width] duration-1000 ease-in-out" style="width: {Math.min((progressStep / 4) * 100, 75)}%"></div>
       </div>
       <p class="text-[10px] text-gray-500 mt-2">Estimasi selesai: {countdown > 0 ? `${countdown} menit lagi` : 'Sebentar lagi...'}</p>
     </div>
@@ -303,7 +328,7 @@
         <svg class="w-5 h-5 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
         <div>
           <p class="text-sm font-semibold text-white">Dana Aman di Escrow</p>
-          <p class="text-[11px] text-gray-500">Rp 400.000 masih dalam sistem</p>
+          <p class="text-[11px] text-gray-500">{ticket.totalPaid} masih dalam sistem</p>
         </div>
       </div>
       <div class="w-2 h-2 rounded-full bg-[#AAEF45] animate-pulse"></div>
@@ -324,7 +349,7 @@
                 {:else if i === progressStep}
                   <div class="w-2 h-2 rounded-full bg-[#AAEF45]"></div>
                 {:else}
-                  <div class="w-2 h-2 rounded-full bg-[#3a3850]"></div>
+                  <div class="w-2 h-2 rounded-full bg-[#3a3850]"/>
                 {/if}
               </div>
               {#if i < timelineSteps.length - 1}
@@ -387,13 +412,13 @@
   <div class="px-4 pt-16 pb-6 flex flex-col items-center text-center">
     <!-- Icon centang besar -->
     <div class="relative mb-4">
-      <div class="w-24 h-24 rounded-full bg-[#AAEF45]/10 border-2 border-[#AAEF45]/30 flex items-center justify-center approved-bounce">
+      <div class="w-24 h-24 rounded-full bg-[#AAEF45]/10 border-2 border-[#AAEF45]/30 flex items-center justify-center animate-bounce-in">
         <div class="w-16 h-16 rounded-full bg-[#AAEF45]/20 border-2 border-[#AAEF45] flex items-center justify-center">
           <svg class="w-8 h-8 text-[#AAEF45]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
         </div>
       </div>
       <!-- Ring animasi -->
-      <div class="absolute inset-0 rounded-full border-2 border-[#AAEF45]/20 ring-pulse"></div>
+      <div class="absolute inset-0 rounded-full border-2 border-[#AAEF45]/20 animate-ring-pulse"></div>
     </div>
     <h1 class="text-2xl font-black text-white mb-1">✅ Refund Approved</h1>
     <p class="text-[13px] text-gray-400">Dana akan dikembalikan ke rekening Anda</p>
@@ -404,7 +429,7 @@
     <div class="bg-[#14121E] border border-[#232033] rounded-2xl p-4 space-y-3">
       <div class="flex justify-between items-center">
         <span class="text-[12px] text-gray-500">Jumlah Refund</span>
-        <span class="text-xl font-black text-white">Rp 400.000</span>
+        <span class="text-xl font-black text-white">{ticket.totalPaid}</span>
       </div>
       <div class="w-full h-px bg-[#232033]"></div>
       <div class="flex justify-between items-center">
@@ -444,7 +469,7 @@
     <div class="bg-[#14121E] border border-[#232033] rounded-2xl p-4 flex items-center justify-between">
       <div>
         <p class="text-[10px] text-gray-500 mb-0.5">Case ID</p>
-        <p class="text-sm font-bold font-mono text-white">REF-2026-00432</p>
+        <p class="text-sm font-bold font-mono text-white">REF-{ticket.id.slice(0,8)}</p>
       </div>
       <div class="flex items-center gap-2">
         <button class="w-8 h-8 bg-[#1A1825] rounded-lg flex items-center justify-center active:scale-95 transition-transform">
@@ -468,7 +493,7 @@
 </main>
 
 <!-- Bottom bar approved -->
-<div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#1A1825] px-4 pt-3 pb-safe z-50 space-y-2">
+<div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#1A1825] px-4 pt-3 pb-[env(safe-area-inset-bottom,1rem)] z-50 space-y-2">
   <button onclick={() => currentPage = 'select'} class="w-full bg-[#AAEF45] text-[#0A0910] text-sm font-black py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(170,239,69,0.25)] active:scale-95 transition-transform">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
     Kembali ke My Tickets
@@ -478,27 +503,5 @@
   </button>
 </div>
 {/if}
+{/if}
 
-<style>
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
-
-  .progress-bar { transition: width 1.5s ease-in-out; }
-
-  .approved-bounce {
-    animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  }
-  @keyframes bounceIn {
-    0%   { transform: scale(0.3); opacity: 0; }
-    50%  { transform: scale(1.05); }
-    70%  { transform: scale(0.95); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .ring-pulse {
-    animation: ringPulse 2s ease-out infinite;
-  }
-  @keyframes ringPulse {
-    0%   { transform: scale(1); opacity: 0.5; }
-    100% { transform: scale(1.4); opacity: 0; }
-  }
-</style>

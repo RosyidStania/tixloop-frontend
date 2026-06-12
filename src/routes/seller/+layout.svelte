@@ -19,4 +19,7 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-{@render children()}
+
+<div class="font-sans" style="font-family: 'Inter', sans-serif;">
+	{@render children()}
+</div>

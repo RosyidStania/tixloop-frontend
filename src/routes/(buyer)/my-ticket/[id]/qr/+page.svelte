@@ -1,16 +1,53 @@
 <script>
   import { page } from '$app/stores';
 
-  // For now using the same dummy data
-  const ticketId = $page.params.id;
+  import { onMount } from 'svelte';
+  import api from '$lib/axios';
 
-  const ticket = {
-    id: ticketId,
-    eventName: 'Cold Play 2026',
-    date: 'June 15, 2026',
-    venue: 'Jakarta Convention Center'
-  };
+  const ticketId = $page.params.id;
+  let ticket = $state(null);
+  let isLoading = $state(true);
+
+  onMount(async () => {
+    try {
+      const res = await api.get(`/tickets/${ticketId}`);
+      const t = res.data.data || res.data;
+      
+      ticket = {
+        id: t.id,
+        ticketCode: t.ticket_code || t.id,
+        eventName: t.event?.event_name || 'Event',
+        date: new Date(t.event?.event_datetime).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        venue: t.event?.venue_name || 'Venue',
+        proofImage: null
+      };
+
+      try {
+        const photoRes = await api.get(`/tickets/${t.id}/physical-photo`, { responseType: 'blob' });
+        ticket.proofImage = URL.createObjectURL(photoRes.data);
+      } catch (err) {
+        console.warn('Gagal memuat physical photo, mencoba invoice proof...');
+        try {
+          const proofRes = await api.get(`/tickets/${t.id}/proof`, { responseType: 'blob' });
+          ticket.proofImage = URL.createObjectURL(proofRes.data);
+        } catch (err2) {
+          console.warn('Gagal memuat kedua gambar tiket:', err2);
+        }
+      }
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isLoading = false;
+    }
+  });
 </script>
+
+{#if isLoading}
+  <div class="flex justify-center items-center min-h-screen bg-[#0A0910]">
+    <div class="w-8 h-8 border-4 border-[#D4FF00] border-t-transparent rounded-full animate-spin"></div>
+  </div>
+{:else if ticket}
 
 <main class="bg-[#0A0910] min-h-screen text-white font-sans flex flex-col justify-center items-center px-4 relative">
   <!-- Back Button -->
@@ -29,16 +66,20 @@
       Tingkatkan Kecerahan Layar
     </div>
 
-    <!-- QR Container -->
-    <div class="bg-white p-5 rounded-3xl mb-6 w-full aspect-square flex items-center justify-center shadow-[0_0_30px_rgba(212,255,0,0.3)]">
-      <svg class="w-full h-full text-black" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v2h-3v-2zm-4-2h2v5h-2v-5zm4 3h2v2h-2v-2zm-6-5h2v2h-2v-2z" />
-      </svg>
+    <!-- Ticket Container -->
+    <div class="bg-white p-2 rounded-xl mb-6 w-full flex items-center justify-center shadow-[0_0_30px_rgba(212,255,0,0.3)] overflow-hidden">
+      {#if ticket.proofImage}
+        <img src={ticket.proofImage} alt="Bukti Tiket" class="w-full h-auto object-contain max-h-[400px]" />
+      {:else}
+        <div class="w-full aspect-square flex items-center justify-center">
+          <p class="text-sm text-gray-500">Gambar tiket tidak tersedia</p>
+        </div>
+      {/if}
     </div>
     
     <!-- Ticket Info -->
     <div class="flex items-center gap-2 bg-[#1A1825] border border-[#232033] px-6 py-3 rounded-2xl mb-6">
-      <span class="text-[#D4FF00] font-mono font-bold text-lg tracking-widest">{ticket.id}</span>
+      <span class="text-[#D4FF00] font-mono font-bold text-lg tracking-widest">{ticket.ticketCode}</span>
     </div>
 
     <div class="text-center w-full">
@@ -48,3 +89,4 @@
     </div>
   </div>
 </main>
+{/if}

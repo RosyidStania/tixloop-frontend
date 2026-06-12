@@ -35,27 +35,23 @@
   ];
 </script>
 
-<!-- Navbar wrapper: tinggi tetap 64px, tidak berubah saat tab apapun aktif -->
-<div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#1E1C2E] px-4 z-50 pb-safe">
+<div class="fixed bottom-0 w-full bg-[#0A0910]/95 backdrop-blur-md border-t border-[#1E1C2E] px-4 z-50 pb-[env(safe-area-inset-bottom,0.5rem)] max-w-[390px] left-1/2 -translate-x-1/2">
   <div class="flex justify-between items-end h-16">
 
     {#each navItems as item}
-      <!-- Setiap tab punya tinggi penuh h-16, posisi konten dari bawah -->
       <a href={item.path} class="relative flex flex-col items-center justify-end h-full pb-2 w-14">
 
-        <!-- ── DEALS TAB ── -->
         {#if item.id === 'deals'}
 
           {#if activeTab === 'deals'}
-            <!-- Deals AKTIF: pill hijau, absolute agar tidak pengaruhi tinggi -->
             <div class="absolute bottom-2 flex flex-col items-center gap-1 px-4 py-2 bg-[#AAEF45] rounded-2xl shadow-[0_4px_24px_rgba(170,239,69,0.35)] -translate-y-3">
-              <div class="fire-wrap">
-                <span class="spark s1 dark"></span>
-                <span class="spark s2 dark"></span>
-                <span class="spark s3 dark"></span>
-                <span class="spark s4 dark"></span>
-                <span class="spark s5 dark"></span>
-                <svg class="fire-svg fire-dark" viewBox="0 0 24 24" fill="currentColor">
+              <div class="relative w-[36px] h-[38px] flex items-center justify-center">
+                <span class="absolute rounded-full opacity-0 z-20 w-[3px] h-[3px] left-[12px] bottom-[30px] !bg-[#3a1a00] animate-fly1"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[4px] h-[4px] left-[20px] bottom-[26px] !bg-[#3a1a00] animate-fly2"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[2px] h-[2px] left-[5px] bottom-[24px] !bg-[#3a1a00] animate-fly3"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[3px] h-[3px] left-[17px] bottom-[32px] !bg-[#3a1a00] animate-fly4"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[2px] h-[2px] left-[8px] bottom-[28px] !bg-[#3a1a00] animate-fly5"></span>
+                <svg class="w-[34px] h-[34px] relative z-10 origin-bottom text-[#1a0800] drop-shadow-[0_0_2px_rgba(0,0,0,0.2)] animate-fire-dark" viewBox="0 0 24 24" fill="currentColor">
                   <path d={item.icon}/>
                 </svg>
               </div>
@@ -63,15 +59,14 @@
             </div>
 
           {:else}
-            <!-- Deals TIDAK AKTIF -->
             <div class="flex flex-col items-center gap-1">
-              <div class="fire-wrap">
-                <span class="spark s1"></span>
-                <span class="spark s2"></span>
-                <span class="spark s3"></span>
-                <span class="spark s4"></span>
-                <span class="spark s5"></span>
-                <svg class="fire-svg fire-blaze" viewBox="0 0 24 24" fill="currentColor">
+              <div class="relative w-[36px] h-[38px] flex items-center justify-center">
+                <span class="absolute rounded-full opacity-0 z-20 w-[3px] h-[3px] left-[12px] bottom-[30px] bg-[#ffaa00] animate-fly1"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[4px] h-[4px] left-[20px] bottom-[26px] bg-[#ff4400] animate-fly2"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[2px] h-[2px] left-[5px] bottom-[24px] bg-[#ffdd00] animate-fly3"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[3px] h-[3px] left-[17px] bottom-[32px] bg-[#ff6600] animate-fly4"></span>
+                <span class="absolute rounded-full opacity-0 z-20 w-[2px] h-[2px] left-[8px] bottom-[28px] bg-[#ff2200] animate-fly5"></span>
+                <svg class="w-[34px] h-[34px] relative z-10 origin-bottom [filter:drop-shadow(0_0_5px_rgba(255,80,0,0.95))_drop-shadow(0_0_12px_rgba(255,150,0,0.5))] animate-fire-blaze" viewBox="0 0 24 24" fill="currentColor">
                   <path d={item.icon}/>
                 </svg>
               </div>
@@ -79,11 +74,9 @@
             </div>
           {/if}
 
-        <!-- ── TAB LAINNYA ── -->
         {:else}
 
           {#if activeTab === item.id}
-            <!-- Aktif: pill hijau, absolute agar tidak pengaruhi tinggi navbar -->
             <div class="absolute bottom-2 flex flex-col items-center gap-1 px-4 py-2 bg-[#AAEF45] rounded-2xl shadow-[0_4px_24px_rgba(170,239,69,0.35)] -translate-y-3">
               <svg class="w-6 h-6 text-[#0A0910]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d={item.icon}/>
@@ -92,7 +85,6 @@
             </div>
 
           {:else}
-            <!-- Tidak aktif: abu-abu statis -->
             <div class="flex flex-col items-center gap-1">
               <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d={item.icon}/>
@@ -107,98 +99,4 @@
     {/each}
 
   </div>
-</div>
-
-<style>
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
-  }
-
-  .fire-wrap {
-    position: relative;
-    width: 36px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .fire-svg {
-    width: 34px;
-    height: 34px;
-    position: relative;
-    z-index: 2;
-    transform-origin: bottom center;
-  }
-
-  .fire-blaze {
-    animation:
-      blazeColor 1.4s ease-in-out infinite alternate,
-      fireWobble 0.8s ease-in-out infinite alternate;
-    filter:
-      drop-shadow(0 0 5px rgba(255, 80, 0, 0.95))
-      drop-shadow(0 0 12px rgba(255, 150, 0, 0.5));
-  }
-
-  .fire-dark {
-    color: #1a0800;
-    animation: fireWobble 0.8s ease-in-out infinite alternate;
-    filter: drop-shadow(0 0 2px rgba(0,0,0,0.2));
-  }
-
-  .spark {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0;
-    z-index: 3;
-  }
-
-  .s1 { width: 3px; height: 3px; left: 12px; bottom: 30px; background: #ffaa00; animation: fly1 1.1s ease-in infinite 0.0s; }
-  .s2 { width: 4px; height: 4px; left: 20px; bottom: 26px; background: #ff4400; animation: fly2 0.95s ease-in infinite 0.25s; }
-  .s3 { width: 2px; height: 2px; left: 5px;  bottom: 24px; background: #ffdd00; animation: fly3 1.3s ease-in infinite 0.55s; }
-  .s4 { width: 3px; height: 3px; left: 17px; bottom: 32px; background: #ff6600; animation: fly4 0.85s ease-in infinite 0.1s; }
-  .s5 { width: 2px; height: 2px; left: 8px;  bottom: 28px; background: #ff2200; animation: fly5 1.15s ease-in infinite 0.4s; }
-
-  .dark { background: #3a1a00 !important; }
-
-  @keyframes blazeColor {
-    0%   { color: #ff1a00; }
-    25%  { color: #ff6600; }
-    50%  { color: #ffaa00; }
-    75%  { color: #ff4400; }
-    100% { color: #ff2200; }
-  }
-
-  @keyframes fireWobble {
-    0%   { transform: scaleY(1)    scaleX(1)    rotate(-1.5deg); }
-    30%  { transform: scaleY(1.07) scaleX(0.95) rotate(1.5deg);  }
-    60%  { transform: scaleY(0.96) scaleX(1.05) rotate(-1deg);   }
-    100% { transform: scaleY(1.04) scaleX(0.98) rotate(2deg);    }
-  }
-
-  @keyframes fly1 {
-    0%   { opacity: 0;   transform: translate(0, 0)     scale(1);   }
-    15%  { opacity: 1; }
-    100% { opacity: 0;   transform: translate(-5px, -20px) scale(0.2); }
-  }
-  @keyframes fly2 {
-    0%   { opacity: 0;   transform: translate(0, 0)    scale(1);   }
-    15%  { opacity: 0.9; }
-    100% { opacity: 0;   transform: translate(6px, -24px) scale(0.2); }
-  }
-  @keyframes fly3 {
-    0%   { opacity: 0;   transform: translate(0, 0)     scale(1);   }
-    20%  { opacity: 1; }
-    100% { opacity: 0;   transform: translate(-3px, -18px) scale(0.3); }
-  }
-  @keyframes fly4 {
-    0%   { opacity: 0;   transform: translate(0, 0)    scale(1);   }
-    10%  { opacity: 0.8; }
-    100% { opacity: 0;   transform: translate(4px, -22px) scale(0.2); }
-  }
-  @keyframes fly5 {
-    0%   { opacity: 0;   transform: translate(0, 0)     scale(1);   }
-    25%  { opacity: 1; }
-    100% { opacity: 0;   transform: translate(-6px, -16px) scale(0.25); }
-  }
-</style>
+</div>
